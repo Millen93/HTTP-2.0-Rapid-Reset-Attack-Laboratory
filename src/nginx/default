@@ -1,0 +1,15 @@
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl;
+
+	include snippets/ssl-params.conf;
+	include snippets/self-signed.conf;
+
+	server_name hack.me ;
+
+	root /opt/site;
+
+	index index.html;
+
+
+}

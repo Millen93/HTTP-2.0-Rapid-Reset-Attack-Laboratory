@@ -1,0 +1,15 @@
+---
+- hosts: target
+  become: true
+  become_method: sudo
+  tasks:
+
+  - name: "Touch sudoers.d file"
+    ansible.builtin.file:
+      path: /etc/sudoers.d/user
+      state: touch
+
+  - name: "Disable sudo prompt"
+    ansible.builtin.lineinfile:
+      path: /etc/sudoers.d/user
+      line: "{{ ansible_user }} ALL=(ALL:ALL) NOPASSWD: ALL"

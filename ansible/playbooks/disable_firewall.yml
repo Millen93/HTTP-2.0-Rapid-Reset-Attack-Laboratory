@@ -1,0 +1,13 @@
+---
+- hosts: target
+  become: true
+  become_method: sudo
+  tasks:
+
+  - name: "Stop Firewall"
+    ansible.builtin.shell:
+      cmd: sudo systemctl stop ufw
+
+  - name: "Disable Firewall"
+    ansible.builtin.shell:
+      cmd: sudo systemctl disable ufw

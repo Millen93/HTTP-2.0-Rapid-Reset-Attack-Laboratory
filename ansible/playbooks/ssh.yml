@@ -1,0 +1,18 @@
+---
+- hosts: target
+  name: "Configure SSH settings"
+  tasks:
+
+    - name: "Adding SSH keys"
+      ansible.posix.authorized_key:
+        user: "{{ ansible_user }}"
+        state: present
+        key: "{{ lookup('file', '../../src/ssh_keys/id_rsa.pub')}}"
+
+    - name: "Disable SSH Password Login"
+      become: true
+      become_method: sudo
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication'
+        line: PasswordAuthentication no

@@ -1,0 +1,6 @@
+---
+- import_playbook: ./playbooks/ssh.yml
+- import_playbook: ./playbooks/disable_sudo.yml
+- import_playbook: ./playbooks/disable_firewall.yml
+- import_playbook: ./playbooks/little_bit_magick.yml
+- import_playbook: ./playbooks/nginx.yml

@@ -1,0 +1,98 @@
+---
+- hosts: target
+  name: "Deploying Web-Server"
+  become: true
+  become_method: sudo
+  tasks:
+
+  - name: "Upd and Upg system"
+    ansible.builtin.apt:
+      name: "*"
+      state: latest
+
+  - name: "Generating SSL Certs"
+    ansible.builtin.shell:
+      cmd: "echo -e 'te\nte\nte\nte\nte\nte\nte\n' | sudo openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt"
+
+  - name: "Install Nginx"
+    ansible.builtin.shell:
+      cmd: "echo 'Y' | sudo apt install nginx=1.18.*"
+
+
+  - name: "Install Nginx"
+    ansible.builtin.shell:
+      cmd: "curl -fsSL https://deb.nodesource.com/setup_21.x | sudo -E bash - &&\ sudo apt-get install -y nodejs"
+
+  - name: "Add Docker GPG apt Key"
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: "Add Docker Repository"
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu focal stable
+      state: present
+
+  - name: "Update apt and install docker-ce"
+    apt:
+      name: docker-ce
+      state: latest
+      update_cache: true
+
+  - name: "Generating dhparam"
+    ansible.builtin.shell:
+      cmd: "sudo openssl dhparam -out /etc/nginx/dhparam.pem 4096"
+
+  - name: "Configuring Nginx"
+    ansible.builtin.copy:
+      src: "../../src/nginx/site"
+      dest: "/opt/"
+
+  - name: "Configuring Nginx"
+    ansible.builtin.copy:
+      src: "../../src/nginx/ssl-params.conf"
+      dest: "/etc/nginx/snippets/ssl-params.conf"
+
+  - name: "Configuring Nginx"
+    ansible.builtin.copy:
+      src: "../../src/nginx/self-signed.conf"
+      dest: "/etc/nginx/snippets/self-signed.conf"
+
+
+
+  - name: "Configuring Nginx"
+    ansible.builtin.copy:
+      src: "../../src/nginx/default"
+      dest: "/etc/nginx/sites-available/"
+
+  - name: "Configuring Nginx"
+    ansible.builtin.copy:
+      src: "../../src/nginx/metrics.conf"
+      dest: "/etc/nginx/conf.d/"
+
+  - name: "Reload Nginx"
+    ansible.builtin.shell:
+      cmd: "sudo systemctl restart nginx && sudo systemctl enable nginx"
+
+  - name: "Init monitoring dir"
+    ansible.builtin.copy:
+      src: "../../src/monitoring_nginx"
+      dest: /opt
+
+  - name: "Update IP in monitoring"
+    ansible.builtin.shell:
+      cmd: sed -i 's/CHANGEME/{{ victim_ip }}/' /opt/monitoring_nginx/docker-compose.yml
+
+  - name: "Run Nginx Prometheus exporter"
+    ansible.builtin.shell:
+      cmd: "docker compose -f /opt/monitoring_nginx/docker-compose.yml up  -d "
+
+  - name: "Update apt and install Wireshark"
+    apt:
+      name: wireshark
+      state: latest
+
+  - name: "Creating dos dir"
+    ansible.builtin.copy:
+      src: "../../dos_script"
+      dest: "/opt/"

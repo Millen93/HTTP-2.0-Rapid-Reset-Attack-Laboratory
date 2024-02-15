@@ -1,0 +1,17 @@
+---
+- hosts: target
+  name: "Little Bit Magick"
+  tasks:
+
+
+   - name: "Changing timezone"
+     ansible.builtin.shell:
+       cmd: "sudo timedatectl set-timezone Europe/Minsk"
+
+   - name: "Extending History size"
+     ansible.builtin.shell:
+       cmd: "echo 'export HISTSIZE=3000' >> /home/{{ ansible_user }}/.bashrc"
+
+   - name: "Setting up format go History"
+     ansible.builtin.shell:
+       cmd: echo "export HISTTIMEFORMAT='%d/%m/%y %T'" >> /home/{{ ansible_user }}/.bashrc
