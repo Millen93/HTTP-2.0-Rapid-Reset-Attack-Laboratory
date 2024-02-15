@@ -13,16 +13,16 @@ Requirements:
  - pip3
 
 Update and Upgrade
-`
+```
 $ sudo apt update && sudo apt upgrade
-`
+```
 
 
 Install Ansible
-`
+```
 $ sudo apt update && sudo apt install -y python3-pip sshpass git
 $ pip3 install ansible
-`
+```
 
 Change variables in the inventory file ansible/inventory:
  - [target] 	      - define the IP of the host where the nginx server should be located
@@ -33,28 +33,28 @@ Change variables in the inventory file ansible/inventory:
  - victim_ip        - same IP as [target]
 
 Generate and place your keys on the host:
-`
+```
 $ ssh-keygen
 $ cp id-rsa.pub src/ssh_keys
-`
+```
 
 Run the playbook
-`
+```
 $ cd ansible
 $ ansible playbook ./configure_vm.yml
-`
+```
 
 ##How to Run the Attack
 
 1. Open Metrics at http://host_ip:9200. Find the parameter nginx_http_requests_total. Here, you can see the total number of HTTP requests and calculate RPS.
 
 2. Open Wireshark, choose your main NIC, and define the TLS key dos_script/ssl-keylog.txt. Instructions on how to do this can be found [here](https://unit42.paloaltonetworks.com/wireshark-tutorial-decrypting-https-traffic/)
-`
+```
 sudo wireshark
-`
+```
 
 3. Run the DoS script
-`
+```
 $ cd  dos_scipt
 $ sudo chmod +x ./attack.sh
 #Change victims IP, do not edit CHANGEME LINE!!
@@ -64,17 +64,17 @@ $ ./attack.sh
 $ sudo apt install parallel
 # Runs script with 10 args
 $ parallel -d0 ./attack.sh ::: {1..10}
-`
+```
 
 ## Alternatively, you can deploy this stand using the following commands
 
 1. Update and Upgrade system
-`
+```
 $ sudo apt update && sudo apt upgrade
-`
+```
 
 2. Install nginx, wireshark, docker
-`
+```
 $ sudo apt install nginx=1.18.*
 $ sudo apt install wireshark
 # Add Docker's official GPG key:
@@ -90,17 +90,17 @@ $ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 $ sudo apt-get update
 $ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-`
+```
 
 
 3. Generate Diffie-Hellman parameters and certs for the server:
-`
+```
 $ sudo openssl dhparam -out /etc/nginx/dhparam.pem 4096
 $ echo -e 'te\nte\nte\nte\nte\nte\nte\n' | sudo openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
-`
+```
 
 4. Congifure nginx
-`
+```
 $ sudo su
 $ cp -rf src/nginx/default /etc/nginx/sites-available/
 $ cp -rf src/nginx/self-signed.conf /etc/ngingx/snippets/
@@ -111,17 +111,17 @@ $ cp -rf src/nginx/metrics.conf /etc/nginx/conf.d/
 $ nginx -t
 # Run nginx
 $ systemctl restart nginx
-`
+```
 
 5. Run monitoring
-`
+```
 $ cd src/monitoring_nginx
 $ docker compose up
-`
+```
 
 6. Stop ufw
-`
+```
 $ sudo systemctl stop ufw
-`
+```
 
 7. Run the attack
