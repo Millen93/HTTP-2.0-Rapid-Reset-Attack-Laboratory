@@ -51,7 +51,7 @@ $ ansible-playbook ./configure_vm.yml
 
 ##How to Run the Attack
 
-1. Open Metrics at http://host_ip:9200. Find the parameter nginx_http_requests_total. Here, you can see the total number of HTTP requests and calculate RPS.
+1. Open Metrics at http://host_ip:9090. Find the parameter nginx_http_requests_total. Here, you can see the total number of HTTP requests and calculate RPS.
 
 2. Open Wireshark, choose your main NIC, and define the TLS key dos_script/ssl-keylog.txt. Instructions on how to do this can be found [here](https://unit42.paloaltonetworks.com/wireshark-tutorial-decrypting-https-traffic/)
 ```
