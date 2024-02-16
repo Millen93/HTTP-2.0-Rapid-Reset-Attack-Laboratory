@@ -4,7 +4,7 @@ Welcome to the project! Here, you can explore how CVE-2023-44487 operates and st
 
 ## Downloading this repository
 ```
-git clone https://github.com/Millen93/HTTP-2.0-Rapid-Reset-Attack-Laboratory.git
+$ git clone https://github.com/Millen93/HTTP-2.0-Rapid-Reset-Attack-Laboratory.git
 ```
 ## Deploying stand
 
