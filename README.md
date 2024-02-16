@@ -5,6 +5,7 @@ Welcome to the project! Here, you can explore how CVE-2023-44487 operates and st
 ## Downloading this repository
 ```
 $ git clone https://github.com/Millen93/HTTP-2.0-Rapid-Reset-Attack-Laboratory.git
+$ cd /HTTP-2.0-Rapid-Reset-Attack-Laboratory
 ```
 ## Deploying stand
 
@@ -39,7 +40,7 @@ Change variables in the inventory file ansible/inventory:
 Generate and place your keys on the host:
 ```
 $ ssh-keygen
-$ cp id_rsa.pub src/ssh_keys
+$ cp ~/.ssh/id_rsa.pub src/ssh_keys
 ```
 
 Run the playbook
