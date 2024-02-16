@@ -39,13 +39,13 @@ Change variables in the inventory file ansible/inventory:
 Generate and place your keys on the host:
 ```
 $ ssh-keygen
-$ cp id-rsa.pub src/ssh_keys
+$ cp id_rsa.pub src/ssh_keys
 ```
 
 Run the playbook
 ```
 $ cd ansible
-$ ansible playbook ./configure_vm.yml
+$ ansible-playbook ./configure_vm.yml
 ```
 
 ##How to Run the Attack
