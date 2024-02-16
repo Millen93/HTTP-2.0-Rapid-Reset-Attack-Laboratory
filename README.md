@@ -1,4 +1,4 @@
-t### HTTP/2.0 Rapid Reset Attack Laboratory
+### HTTP/2.0 Rapid Reset Attack Laboratory
 
 Welcome to the project! Here, you can explore how CVE-2023-44487 operates and study methods to prevent this attack.
 
@@ -49,7 +49,7 @@ $ cd ansible
 $ ansible-playbook ./configure_vm.yml
 ```
 
-##How to Run the Attack
+## How to Run the Attack
 
 1. Open Metrics at http://host_ip:9090. Find the parameter nginx_http_requests_total. Here, you can see the total number of HTTP requests and calculate RPS.
 
