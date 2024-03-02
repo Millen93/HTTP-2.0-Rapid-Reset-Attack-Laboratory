@@ -3,6 +3,12 @@
   name: "Configure SSH settings"
   tasks:
 
+
+    - name: "Generating SSH keys"
+      community.crypto.openssh_keypair:
+        path: ../../src/ssh_keys/id_rsa
+      delegate_to: localhost
+
     - name: "Adding SSH keys"
       ansible.posix.authorized_key:
         user: "{{ ansible_user }}"

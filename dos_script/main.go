@@ -26,7 +26,6 @@ var delayTime int
 var sentHeaders, sentRSTs, recvFrames int32
 var headerStart, headerEnd time.Time
 
-// Accept command line arguments
 func init() {
 	flag.IntVar(&numRequests, "requests", 5, "Number of requests to send")
 	flag.StringVar(&serverURLStr, "url", "https://localhost:443", "Server URL")
@@ -36,15 +35,13 @@ func init() {
 	flag.Parse()
 }
 
-// HPACK headers, write HEADERS to server, and send RST_STREAM
 func sendRequest(framer *http2.Framer, mu *sync.Mutex, path string, serverURL *url.URL, delay int, doneChan chan<- struct{}) {
 	defer func() {
-		doneChan <- struct{}{} // Signal that this worker is done
+		doneChan <- struct{}{} 
 	}()
 
 	var headerBlock bytes.Buffer
 
-	// Encode headers
 	encoder := hpack.NewEncoder(&headerBlock)
 
 	encoder.WriteField(hpack.HeaderField{Name: ":method", Value: "GET"})
@@ -52,7 +49,7 @@ func sendRequest(framer *http2.Framer, mu *sync.Mutex, path string, serverURL *u
 	encoder.WriteField(hpack.HeaderField{Name: ":scheme", Value: "https"})
 	encoder.WriteField(hpack.HeaderField{Name: ":authority", Value: serverURL.Host})
 
-	streamID := atomic.AddUint32(&streamCounter, 2) // Increment streamCounter and allocate stream ID in units of two to ensure stream IDs are odd numbered per RFC 9113
+	streamID := atomic.AddUint32(&streamCounter, 2) 
 	if err := framer.WriteHeaders(http2.HeadersFrameParam{
 		StreamID:      streamID,
 		BlockFragment: headerBlock.Bytes(),
@@ -65,7 +62,6 @@ func sendRequest(framer *http2.Framer, mu *sync.Mutex, path string, serverURL *u
 		fmt.Printf("[%d] Sent HEADERS on stream %d\n", streamID, streamID)
 	}
 
-	// Sleep for several ms before sending RST_STREAM
 	time.Sleep(time.Millisecond * time.Duration(delay))
 
 	if err := framer.WriteRSTStream(streamID, http2.ErrCodeCancel); err != nil {
@@ -77,7 +73,6 @@ func sendRequest(framer *http2.Framer, mu *sync.Mutex, path string, serverURL *u
 
 }
 
-// Print a pretty summary before exiting
 func printSummary() {
 	elapsed := headerEnd.Sub(headerStart).Seconds()
 	fmt.Printf("\n--- Summary ---\n")
@@ -87,11 +82,9 @@ func printSummary() {
 }
 
 func main() {
-	// Establish TLS with server and ignore certificate
 	keylog := flag.String("keylog", "ssl-keylog.txt", "File name to write NSS key log format log of TLS keys")
 	flag.Parse()
 
-	// Open the file in append mode
 	kl, err := os.OpenFile(*keylog, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
 	if err != nil {
 		panic(err)
@@ -106,7 +99,6 @@ func main() {
 	headerStart = time.Now()
 	streamCounter = 1
 
-	// Establish TLS with server and ignore certificate
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: true,
 		NextProtos:         []string{"h2"},
@@ -123,18 +115,15 @@ func main() {
 		log.Fatalf("Failed to send client preface: %s", err)
 	}
 
-	// Initialize HTTP2 framer and mutex
 	framer := http2.NewFramer(conn, conn)
 	var mu sync.Mutex
 
-	// Send initial SETTINGS frame
 	mu.Lock()
 	if err := framer.WriteSettings(); err != nil {
 		log.Fatalf("Failed to write settings: %s", err)
 	}
 	mu.Unlock()
 
-	// Read and count received frames, print to stdout
 	go func() {
 		for {
 			frame, err := framer.ReadFrame()
@@ -150,7 +139,6 @@ func main() {
 		}
 	}()
 
-	// Wait for SETTINGS frame from server
 	for {
 		frame, err := framer.ReadFrame()
 		if err != nil {
@@ -166,17 +154,14 @@ func main() {
 		path = "/"
 	}
 
-	// Create a buffered channel to control concurrency
 	concurrency := concurrencyLimit
 	doneChan := make(chan struct{}, concurrency)
 
-	// Send requests
 	for i := 0; i < numRequests; i++ {
 		time.Sleep(time.Millisecond * time.Duration(waitTime))
 		go sendRequest(framer, &mu, path, serverURL, delayTime, doneChan)
 	}
 
-	// Wait for all workers to finish
 	for i := 0; i < numRequests; i++ {
 		<-doneChan
 	}
