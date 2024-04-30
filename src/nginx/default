@@ -1,15 +1,29 @@
 server {
+
+	gzip on;
+	gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+	gzip_vary on;
+	gzip_proxied any;
+	gzip_comp_level 9;
+
+
 	listen 443 ssl http2;
 	listen [::]:443 ssl;
+        keepalive_requests 1000000000;
+        http2_max_concurrent_streams 100000000000;
+	http2_max_requests 100000000000000;
+	
 
-	include snippets/ssl-params.conf;
 	include snippets/self-signed.conf;
+	include snippets/ssl-params.conf;
 
-	server_name hack.me ;
+        root /opt/site;
 
-	root /opt/site;
+        index index.html;
 
-	index index.html;
+	server_name _;
 
-
+	location / {
+		try_files $uri $uri/ =404;
+	}
 }
