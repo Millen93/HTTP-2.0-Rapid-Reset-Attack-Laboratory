@@ -4,16 +4,11 @@
   tasks:
 
 
-    - name: "Generating SSH keys"
-      community.crypto.openssh_keypair:
-        path: ../../src/ssh_keys/id_rsa
-      delegate_to: localhost
-
     - name: "Adding SSH keys"
       ansible.posix.authorized_key:
         user: "{{ ansible_user }}"
         state: present
-        key: "{{ lookup('file', '../../src/ssh_keys/id_rsa.pub')}}"
+        key: "{{ lookup('file', '../../src/ssh_keys')}}"
 
     - name: "Disable SSH Password Login"
       become: true

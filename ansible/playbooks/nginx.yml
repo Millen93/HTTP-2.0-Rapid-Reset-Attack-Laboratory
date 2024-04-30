@@ -6,9 +6,10 @@
   tasks:
 
   - name: "Upd and Upg system"
-    ansible.builtin.apt:
-      name: "*"
-      state: latest
+    apt:
+      upgrade: "yes"
+      update_cache: "yes"
+      cache_valid_time: 86400
 
   - name: "Generating SSL Certs"
     ansible.builtin.shell:
@@ -68,6 +69,11 @@
   - name: "Reload Nginx"
     ansible.builtin.shell:
       cmd: "sudo systemctl restart nginx && sudo systemctl enable nginx"
+
+  - name: "Reload Docker"
+    ansible.builtin.shell:
+      cmd: "sudo systemctl restart docker && sudo systemctl enable docker"
+
 
   - name: "Init monitoring dir"
     ansible.builtin.copy:
